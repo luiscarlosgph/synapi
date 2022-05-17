@@ -11,7 +11,7 @@ $ python3 -m pip install synapi --user
 Install from source
 -------------------
 ```
-$ python3 setup.py install
+$ python3 setup.py install --user
 ```
 
 Run unit tests
