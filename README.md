@@ -2,7 +2,7 @@ Description
 -----------
 Python package that will allow you to treat the Synapse repository as a local directory.
 
-To use this package you need to be a Synapse Certified User. To get certified, you have to go to your *Account Settings*, click *Get Certified* and pass the quiz you will be prompted with.
+To use this package you need to be a Synapse Certified User. To get certified you have to go to your *Account Settings*, click *Get Certified*, and pass the quiz you will be prompted with.
 
 Install with pip
 ----------------
