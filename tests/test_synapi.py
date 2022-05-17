@@ -12,7 +12,7 @@ import shutil
 import synapseclient
 
 # My imports
-import lemon_dataset.synapi as synapi
+import synapi
 
 class TestSynapseMethods(unittest.TestCase):
 
