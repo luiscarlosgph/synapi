@@ -17,7 +17,7 @@ $ python3 setup.py install
 Run unit tests
 --------------
 ```
-$ python3 setup.py test
+$ python3 -m unittest tests/test_synapi.py
 ```
 
 Exemplary code snippet
