@@ -2,8 +2,14 @@ Description
 -----------
 Python package that will allow you to treat the Synapse repository as a local directory.
 
-Install
--------
+Install with pip
+----------------
+```
+$ python3 -m pip install synapi --user
+```
+
+Install from source
+-------------------
 ```
 $ python3 setup.py install
 ```
