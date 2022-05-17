@@ -19,6 +19,7 @@ Run unit tests
 ```
 $ python3 -m unittest tests/test_synapi.py
 ```
+This script will prompt you for your Synapse credentials and the ID of a Synapse project where the tests will be executed.
 
 Exemplary code snippet
 ----------------------
