@@ -14,7 +14,7 @@ import random
 import string
 
 class SynapseSession:
-    def __init__(self, username, password, project_id):
+    def __init__(self, username: str, password: str, project_id: str):
         # Store params
         self.username = username
         self.password = password
@@ -41,14 +41,16 @@ class SynapseSession:
         # The project is the parent if none is specified
         parent_id = self.project_id if parent_id is None else parent_id
 
-        if sep in path:
+        if path == '/':
+            return parent_id
+        elif sep in path:
             path_list = path.split(sep)
             child_id = self.syn.findEntityId(path_list[0], parent=parent_id)
             return self.get_id(sep.join(path_list[1:]), child_id)
         else: 
             return self.syn.findEntityId(path, parent=parent_id)
         
-    def exists(self, path, concrete_type, parent_id=None):
+    def exists(self, path: str, concrete_type: list, parent_id=None):
         """
         @brief Checks whether a folder exists in the repository.
 
@@ -64,7 +66,7 @@ class SynapseSession:
         fsynid = self.get_id(path, parent_id)
         if fsynid:
             info = self.syn.get(fsynid, downloadFile=False)
-            return True if info.properties['concreteType'] == concrete_type else False
+            return True if info.properties['concreteType'] in concrete_type else False
         else:
             return False
 
@@ -77,8 +79,9 @@ class SynapseSession:
 
         @returns True if the folder in path exists. Otherwise returns False.
         """
-        return self.exists(path, 'org.sagebionetworks.repo.model.Folder', parent_id)
-        
+        return self.exists(path, ['org.sagebionetworks.repo.model.Folder', 
+                                  'org.sagebionetworks.repo.model.Project'], 
+                           parent_id)
 
     def file_exists(self, path: str, parent_id=None) -> bool:
         """
@@ -89,9 +92,11 @@ class SynapseSession:
 
         @returns True if the file exists. Otherwise returns False.
         """
-        return self.exists(path, 'org.sagebionetworks.repo.model.FileEntity', parent_id)
+        return self.exists(path, ['org.sagebionetworks.repo.model.FileEntity'], 
+                           parent_id)
 
-    def upload(self, local_path, remote_path, parent_id=None, hidden=False):
+    def upload(self, local_path: str, remote_path: str, parent_id=None,
+               hidden: bool = False):
         """
         @brief    Upload a file or a directory tree to Synapse.
         @details  This method will overwrite whatever is already stored in the 
@@ -145,7 +150,7 @@ class SynapseSession:
                 self.upload(os.path.join(local_path, f), f, 
                             folder.properties.id, hidden)
 
-    def download(self, remote_path, local_path, parent_id=None,
+    def download(self, remote_path: str, local_path, parent_id=None,
                  synapse_file_type: str = 'org.sagebionetworks.repo.model.FileEntity',
                  synapse_dir_type: str = 'org.sagebionetworks.repo.model.Folder'):
         """
@@ -201,7 +206,7 @@ class SynapseSession:
                 + remote_path + ' does not point to a valid ' \
                 + 'file or a folder in Synapse.')
 
-    def mkdir(self, path, parent_id=None):
+    def mkdir(self, path: str, parent_id=None):
         """
         @brief  Creates a folder within the given folder/project.
 
@@ -236,7 +241,7 @@ class SynapseSession:
         else:
             return self.mkdir(os.sep.join(path_list[1:]), child_id)
 
-    def rm(self, path, parent_id=None):
+    def rm(self, path: str, parent_id=None):
         """
         @brief Delete a file or a folder.
          
@@ -254,7 +259,7 @@ class SynapseSession:
                 + ' that you are trying to delete does not exist.')
         self.syn.delete(entity_id)
 
-    def get_parent_id(self, path, parent_id=None) -> str:
+    def get_parent_id(self, path: str, parent_id=None) -> str:
         """
         @brief   Get the parent id of a Synapse object.
         @details The path does not need to exist, as we are only interested
@@ -273,7 +278,7 @@ class SynapseSession:
         else:
             return parent_id
 
-    def mv(self, src_path, dst_path, parent_id=None):   
+    def mv(self, src_path: str, dst_path: str, parent_id=None):   
         """
         @brief   Moves a file or folder from the src_path to the dst_path.
         @details The destination path must not exist.
@@ -316,7 +321,7 @@ class SynapseSession:
         e.properties['name'] = dst_fname
         e = self.syn.store(e)
 
-    def cp(self, src_path, dst_path, parent_id=None):
+    def cp(self, src_path: str, dst_path: str, parent_id=None):
         """
         @brief   Copy a file or folder to another path in the Synapse repo.
         @details The destination path must not exist. 
@@ -366,6 +371,34 @@ class SynapseSession:
 
         # Remove temporary folder
         self.rm(temp_dir_name, parent_id)
+
+    def ls(self, remote_path: str, parent_id=None) -> list:
+        """
+        @brief List the contents of a directory in Synapse.
+
+        @param[in]  remote_path  Relative path (from the parent_id) to the
+                                 directory you want to list.
+        @param[in]  parent_id    SynID of the directory that serves as a base
+                                 for the path.
+
+        @returns a list with the names of the file and folders.  
+        """
+        # The project is the parent if none is specified
+        parent_id = self.project_id if parent_id is None else parent_id
+
+        # Make sure that the directory exists
+        if not self.dir_exists(remote_path, parent_id):
+            raise OSError('[ERROR] The directory ' + remote_path \
+                          + ' does not exist.')
+
+        # Get the synID of the folder
+        dir_id = self.get_id(remote_path, parent_id)
+
+        # List all the files and folders inside the remote folder
+        children = self.syn.getChildren(dir_id, includeTypes=['folder', 'file'])
+        files = [x['name'] for x in children]
+        
+        return files
 
 
 if __name__ == '__main__':

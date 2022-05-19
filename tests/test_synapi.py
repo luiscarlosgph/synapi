@@ -366,6 +366,35 @@ class TestSynapseMethods(unittest.TestCase):
         sess.rm('dir_cp_foo1')
         sess.rm('dir_cp_foo3')
 
+    def test_listdir(self):
+        # Log into Synapse
+        sess = synapi.SynapseSession(TestSynapseMethods._username,
+                                           TestSynapseMethods._password,
+                                           TestSynapseMethods._project_id)
+
+        # Create an empty folder in the repository
+        sess.mkdir('test_listdir')
+
+        # Create a couple of dummy files
+        content = 'Testing SynapseSession listdir method.'
+        local_path = os.path.join(tempfile.gettempdir(), 'test_ls.txt') 
+        with open(local_path, 'w') as f:
+            f.write(content)
+        
+        # Upload a couple of files to the folder
+        sess.upload(local_path, 'test_listdir/test_ls.txt')
+        sess.cp('test_listdir/test_ls.txt', 'test_listdir/test_ls2.txt')
+
+        # Create a folder inside
+        sess.mkdir('test_listdir/foo')
+
+        # List directory
+        ls = set(sess.ls('test_listdir'))
+        self.assertEqual(ls, set(['test_ls.txt', 'test_ls2.txt', 'foo']))
+
+        # Delete test folder
+        sess.rm('test_listdir')
+
 
 if __name__ == '__main__':
     unittest.main()
