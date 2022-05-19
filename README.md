@@ -55,6 +55,9 @@ sess.mv('remote/path1', 'remote/path2')
 # Remove file or directory
 sess.rm('remote/path')
 
+# List a project or directory in Synapse
+files = sess.ls('remote/path')
+
 # Get the Synapse ID of a file or folder
 synapse_id = sess.get_id('remote/path')
 
