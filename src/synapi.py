@@ -79,6 +79,8 @@ class SynapseSession:
 
         @returns True if the folder in path exists. Otherwise returns False.
         """
+        if path and path[0] == '/':
+            path = path[1:]
         return self.exists(path, ['org.sagebionetworks.repo.model.Folder', 
                                   'org.sagebionetworks.repo.model.Project'], 
                            parent_id)
@@ -92,6 +94,8 @@ class SynapseSession:
 
         @returns True if the file exists. Otherwise returns False.
         """
+        if path and path[0] == '/':
+            path = path[1:]
         return self.exists(path, ['org.sagebionetworks.repo.model.FileEntity'], 
                            parent_id)
 
@@ -114,6 +118,10 @@ class SynapseSession:
         """
         # The project is the parent if none is specified
         parent_id = self.project_id if parent_id is None else parent_id
+
+        # Remove initial slash if present
+        if remote_path and remote_path[0] == '/':
+            remote_path = remote_path[1:]
 
         # Get id of the parent directory containing the remote path
         if '/' in remote_path:
@@ -161,6 +169,10 @@ class SynapseSession:
         """
         # The project is the parent if none is specified
         parent_id = self.project_id if parent_id is None else parent_id
+
+        # Remove initial slash if present
+        if remote_path and remote_path[0] == '/':
+            remote_path = remote_path[1:]
 
         # Check that the destination file/folder does not exist
         if os.path.exists(local_path):
@@ -218,6 +230,10 @@ class SynapseSession:
         # The project is the parent if none is specified
         parent_id = self.project_id if parent_id is None else parent_id
 
+        # Remove initial slash (if present)
+        if path and path[0] == '/':
+            path = path[1:]
+
         # If the last folder of the path exists, we should not be creating it
         if self.dir_exists(path, parent_id): 
             raise ValueError('[ERROR] Cannot create a folder that already exists.' \
@@ -253,6 +269,10 @@ class SynapseSession:
         # The project is the parent if none is specified
         parent_id = self.project_id if parent_id is None else parent_id
 
+        # Remove initial slash if present
+        if path and path[0] == '/':
+            path = path[1:]
+
         entity_id = self.get_id(path, parent_id)
         if entity_id is None:
             raise ValueError('[ERROR] The file in ' + path \
@@ -272,8 +292,10 @@ class SynapseSession:
         """
         # The project folder is the parent if none is specified
         parent_id = self.project_id if parent_id is None else parent_id
-
-        if '/' in path:
+        
+        if path == '/' and parent_id == self.project_id:
+            raise ValueError('[ERROR] The project does not have a parent.')
+        elif '/' in path:
             return self.get_id(os.sep.join(path.split(os.sep)[:-1]), parent_id)
         else:
             return parent_id
@@ -291,6 +313,10 @@ class SynapseSession:
         """
         # The project is the parent if none is specified
         parent_id = self.project_id if parent_id is None else parent_id
+
+        # Remove initial slash if present
+        if dst_path and dst_path[0] == '/':
+            dst_path = dst_path[1:]
 
         # Check the the source file/folder exists
         if self.get_id(src_path, parent_id) is None:
@@ -334,6 +360,10 @@ class SynapseSession:
         """
         # The project is the parent if none is specified
         parent_id = self.project_id if parent_id is None else parent_id
+
+        # Remove initial slash if present
+        if dst_path and dst_path[0] == '/':
+            dst_path = dst_path[1:]
 
         # Check the the source file/folder exists
         if self.get_id(src_path, parent_id) is None:
