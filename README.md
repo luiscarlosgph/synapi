@@ -25,7 +25,7 @@ This script will prompt you for your Synapse credentials and the ID of a Synapse
 
 Exemplary code snippet
 ----------------------
-```
+```python3
 #!/usr/bin/env python3
 
 import synapi
