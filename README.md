@@ -64,3 +64,15 @@ synapse_id = sess.get_id('remote/path')
 ```
 
 All methods have a `parent_id` parameter, if you do not specify one, the parent ID used is the project ID passed in the constuctor.
+
+
+Author
+------
+
+Copyright © 2023 Luis Carlos Garcia Peraza Herrera.
+
+
+License
+-------
+
+This repository is shared under an [MIT License](LICENSE).
